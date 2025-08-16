@@ -1,0 +1,56 @@
+en:
+  js:
+    github_sponsors:
+      title: "GitHub Sponsors"
+      sync_button: "Sync Sponsors Now"
+      syncing: "Syncing..."
+      last_sync: "Last sync:"
+      sync_history_title: "Sync History (Last 10)"
+      sync_results_title: "Sync Results"
+      
+      table:
+        time: "Time"
+        status: "Status"
+        total: "Total"
+        matched: "Matched"
+        added: "Added"
+        removed: "Removed"
+        error: "Error"
+        
+      stats:
+        github_account: "GitHub Account:"
+        group_name: "Group Name:"
+        total_sponsors: "Total GitHub Sponsors:"
+        discourse_users: "Discourse Users with GitHub:"
+        current_group_size: "Current Group Size:"
+        matched_sponsors: "Matched Sponsors:"
+        unmatched_sponsors: "Unmatched Sponsors:"
+        added_to_group: "Added to Group:"
+        removed_from_group: "Removed from Group:"
+        already_in_group: "Already in Group:"
+        badges_granted: "✓ Badges Granted"
+        
+      sections:
+        matched_sponsors: "✅ Matched Sponsors"
+        unmatched_sponsors: "⚠️ Unmatched Sponsors - No Discourse Account"
+        newly_added: "➕ Newly Added"
+        removed: "➖ Removed"
+        all_sponsors: "📋 All GitHub Sponsor Usernames"
+        
+      columns:
+        github_username: "GitHub Username"
+        discourse_username: "Discourse Username"
+        user_id: "User ID"
+        
+      messages:
+        no_linked_account: "These GitHub sponsors don't have linked Discourse accounts:"
+        click_to_sync: "Click \"Sync Sponsors Now\" to fetch and display sponsor information"
+        error_prefix: "Error:"
+        show_details: "Show Details"
+        stack_trace: "Stack Trace"
+        
+      errors:
+        sync_failed: "Failed to sync GitHub sponsors"
+        api_error: "GitHub API error"
+        no_token: "GitHub token not configured"
+        no_account: "GitHub account not configured"

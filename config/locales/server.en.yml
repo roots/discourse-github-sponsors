@@ -1,0 +1,38 @@
+en:
+  site_settings:
+    github_sponsors_enabled: "Enable GitHub Sponsors sync"
+    github_sponsors_group_name: "The Discourse group to sync sponsors to"
+    github_sponsors_account: "GitHub username or organization to check sponsors for"
+    github_sponsors_token: "GitHub personal access token for fetching sponsor data"
+    github_sponsors_flair_icon: "Font Awesome icon for sponsor flair"
+    github_sponsors_flair_color: "Text color for sponsor flair (hex without #)"
+    github_sponsors_flair_bg_color: "Background color for sponsor flair (hex without #)"
+    github_sponsors_sync_history_retention_days: "Number of days to retain sync history records"
+    
+    errors:
+      github_token_invalid: "Invalid GitHub token format. Must be a valid personal access token (ghp_... or 40 hex characters)"
+      github_account_invalid: "Invalid GitHub account name. Must be a valid GitHub username or organization"
+      
+  github_sponsors:
+    badge_name: "GitHub Sponsor"
+    badge_description: "Active GitHub Sponsor"
+    badge_long_description: "This badge is granted to active GitHub sponsors"
+    group_full_name: "GitHub Sponsors"
+    
+    sync:
+      started: "Starting GitHub sponsors sync"
+      completed: "GitHub sponsors sync completed: %{matched} matched, %{unmatched} unmatched"
+      failed: "GitHub sponsors sync failed: %{error}"
+      
+    errors:
+      plugin_disabled: "GitHub Sponsors plugin is disabled"
+      no_token: "GitHub token not configured"
+      no_account: "GitHub account not configured"
+      invalid_token: "Invalid GitHub token: %{status}"
+      missing_scopes: "Token missing required scopes: %{scopes}"
+      api_error: "GitHub API error: %{message}"
+      rate_limited: "GitHub API rate limit exceeded. Try again later."
+
+  dashboard:
+    github_sponsors:
+      github_token_invalid: "GitHub Sponsors: API token is invalid or has expired. Please update the token in site settings."

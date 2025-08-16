@@ -1,0 +1,51 @@
+discourse_github_sponsors:
+  github_sponsors_enabled:
+    default: false
+    client: true
+    description: "Enable GitHub Sponsors sync"
+
+  github_sponsors_group_name:
+    default: "sponsors"
+    type: string
+    description: "The Discourse group to sync sponsors to"
+
+  github_sponsors_account:
+    default: ""
+    type: string
+    description: "GitHub username/org to check sponsors for"
+    validator: "GithubAccountValidator"
+
+  github_sponsors_token:
+    default: ""
+    type: secret
+    description: "GitHub API token for fetching sponsor data (requires scopes: read:org, read:user, user:email)"
+    validator: "GithubTokenValidator"
+
+  github_sponsors_flair_icon:
+    default: "fab-github"
+    type: string
+    description: "Font Awesome icon for sponsor flair (e.g. 'fab-github', 'seedling')"
+    client: true
+
+  github_sponsors_flair_color:
+    default: "ffffff"
+    type: string
+    description: "Text color for sponsor flair (hex without #)"
+    client: true
+
+  github_sponsors_flair_bg_color:
+    default: ""
+    type: string
+    description: "Background color for sponsor flair (hex without #, leave blank for no background)"
+    client: true
+
+  github_sponsors_sync_history_retention_days:
+    default: 30
+    type: integer
+    min: 7
+    max: 365
+    description: "Number of days to retain sync history records (older records are automatically deleted)"
+
+  github_sponsors_verbose_log:
+    default: false
+    description: "Enable verbose logging for GitHub Sponsors sync operations"
