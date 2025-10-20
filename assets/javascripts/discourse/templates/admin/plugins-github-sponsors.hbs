@@ -32,6 +32,119 @@
     {{/if}}
   </div>
 
+  <div
+    style="background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 5px; padding: 15px; margin-bottom: 20px;"
+  >
+    <h3>Discord Invite History</h3>
+
+    {{#if this.discordLoading}}
+      <p style="text-align: center; color: #666; padding: 20px;">
+        Loading Discord invite history...
+      </p>
+    {{else}}
+      {{#if this.discordStats}}
+        <div
+          style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 15px; margin-bottom: 15px; padding: 15px; background: white; border-radius: 5px;"
+        >
+          <div style="text-align: center;">
+            <div style="font-size: 24px; font-weight: bold; color: #007bff;">
+              {{this.discordStats.total}}
+            </div>
+            <div style="font-size: 12px; color: #666;">Total Invites</div>
+          </div>
+          <div style="text-align: center;">
+            <div style="font-size: 24px; font-weight: bold; color: #28a745;">
+              {{this.discordStats.used}}
+            </div>
+            <div style="font-size: 12px; color: #666;">Used</div>
+          </div>
+          <div style="text-align: center;">
+            <div style="font-size: 24px; font-weight: bold; color: #dc3545;">
+              {{this.discordStats.expired}}
+            </div>
+            <div style="font-size: 12px; color: #666;">Expired</div>
+          </div>
+          <div style="text-align: center;">
+            <div style="font-size: 24px; font-weight: bold; color: #17a2b8;">
+              {{this.discordStats.active}}
+            </div>
+            <div style="font-size: 12px; color: #666;">Active</div>
+          </div>
+          <div style="text-align: center;">
+            <div style="font-size: 24px; font-weight: bold; color: #6c757d;">
+              {{this.discordStats.usage_rate}}%
+            </div>
+            <div style="font-size: 12px; color: #666;">Usage Rate</div>
+          </div>
+        </div>
+      {{/if}}
+
+      {{#if this.discordInvites.length}}
+        <table style="width: 100%; border-collapse: collapse;">
+          <thead>
+            <tr style="background: #e9ecef;">
+              <th
+                style="padding: 8px; text-align: left; border-bottom: 2px solid #dee2e6;"
+              >User</th>
+              <th
+                style="padding: 8px; text-align: left; border-bottom: 2px solid #dee2e6;"
+              >GitHub</th>
+              <th
+                style="padding: 8px; text-align: left; border-bottom: 2px solid #dee2e6;"
+              >Discord</th>
+              <th
+                style="padding: 8px; text-align: left; border-bottom: 2px solid #dee2e6;"
+              >Created</th>
+              <th
+                style="padding: 8px; text-align: left; border-bottom: 2px solid #dee2e6;"
+              >Expires</th>
+              <th
+                style="padding: 8px; text-align: center; border-bottom: 2px solid #dee2e6;"
+              >Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {{#each this.discordInvites as |invite|}}
+              <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px;">{{invite.username}}</td>
+                <td style="padding: 8px;">{{invite.github_username}}</td>
+                <td style="padding: 8px;">{{invite.discord_username}}</td>
+                <td
+                  style="padding: 8px; font-size: 12px;"
+                >{{invite.created_at}}</td>
+                <td
+                  style="padding: 8px; font-size: 12px;"
+                >{{invite.expires_at}}</td>
+                <td style="padding: 8px; text-align: center;">
+                  {{#if (eq invite.status "used")}}
+                    <span
+                      style="background: #d4edda; color: #155724; padding: 2px 8px; border-radius: 3px; font-size: 11px; font-weight: bold;"
+                    >USED</span>
+                  {{else if invite.expired}}
+                    <span
+                      style="background: #f8d7da; color: #721c24; padding: 2px 8px; border-radius: 3px; font-size: 11px; font-weight: bold;"
+                    >EXPIRED</span>
+                  {{else}}
+                    <span
+                      style="background: #d1ecf1; color: #0c5460; padding: 2px 8px; border-radius: 3px; font-size: 11px; font-weight: bold;"
+                    >ACTIVE</span>
+                  {{/if}}
+                </td>
+              </tr>
+            {{/each}}
+          </tbody>
+        </table>
+      {{else}}
+        <p
+          style="text-align: center; color: #666; padding: 40px; background: white; border-radius: 5px;"
+        >
+          No Discord invites have been generated yet. Once sponsors generate
+          invites, they will appear here.
+        </p>
+      {{/if}}
+    {{/if}}
+  </div>
+
   {{#if this.syncHistory.length}}
     <div
       style="background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 5px; padding: 15px; margin-bottom: 20px;"

@@ -66,10 +66,20 @@ module DiscourseGithubSponsors
         "#{github_username} generated a Discord invite (Discord: #{discord_username})",
       )
 
+      # Log the invite generation
+      expires_at = Time.now + SiteSetting.discord_invite_max_age
+      DiscordInviteLog.log_invite(
+        user: current_user,
+        invite_code: invite_code,
+        discord_username: discord_username,
+        github_username: github_username,
+        expires_at: expires_at,
+      )
+
       render json: {
                invite_code: invite_code,
                invite_url: "https://discord.gg/#{invite_code}",
-               expires_at: Time.now.to_i + SiteSetting.discord_invite_max_age,
+               expires_at: expires_at.to_i,
              }
     rescue DiscourseGithubSponsors::DiscordApi::PermissionError => e
       Rails.logger.error("Discord permission error: #{e.message}")

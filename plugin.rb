@@ -59,6 +59,9 @@ after_initialize do
         :constraints => AdminConstraint.new
     get "/admin/plugins/github-sponsors/history" => "discourse_github_sponsors/admin#history",
         :constraints => AdminConstraint.new
+    get "/admin/plugins/github-sponsors/discord-invites" =>
+          "discourse_github_sponsors/admin#discord_invites",
+        :constraints => AdminConstraint.new
     post "/admin/plugins/github-sponsors/sync" => "discourse_github_sponsors/admin#sync",
          :constraints => AdminConstraint.new
     get "/sponsors/status" => "discourse_github_sponsors/user_status#show"

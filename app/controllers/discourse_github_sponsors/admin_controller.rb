@@ -51,6 +51,46 @@ module DiscourseGithubSponsors
       render json: { history: history }
     end
 
+    def discord_invites
+      invites =
+        DiscordInviteLog
+          .recent
+          .includes(:user)
+          .map do |invite|
+            {
+              id: invite.id,
+              user_id: invite.user_id,
+              username: invite.user.username,
+              github_username: invite.github_username,
+              discord_username: invite.discord_username,
+              invite_code: invite.invite_code,
+              created_at: invite.created_at,
+              expires_at: invite.expires_at,
+              used_at: invite.used_at,
+              expired: invite.expired?,
+              status: invite.status,
+            }
+          end
+
+      # Calculate statistics
+      total_invites = DiscordInviteLog.count
+      used_invites = DiscordInviteLog.used.count
+      expired_invites = DiscordInviteLog.where("expires_at < ?", Time.current).count
+      active_invites = DiscordInviteLog.where("expires_at >= ?", Time.current).unused.count
+
+      render json: {
+               invites: invites,
+               stats: {
+                 total: total_invites,
+                 used: used_invites,
+                 expired: expired_invites,
+                 active: active_invites,
+                 usage_rate:
+                   total_invites > 0 ? ((used_invites.to_f / total_invites) * 100).round(1) : 0,
+               },
+             }
+    end
+
     def sync
       begin
         result = ::DiscourseGithubSponsors::Sync.new.perform

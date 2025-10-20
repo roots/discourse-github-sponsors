@@ -27,6 +27,15 @@ export default class AdminPluginsGithubSponsors extends Controller {
   /** @type {Object|null} GitHub API rate limit status */
   @tracked rateLimit = null;
 
+  /** @type {Array} Discord invite history entries */
+  @tracked discordInvites = [];
+
+  /** @type {Object|null} Discord invite statistics */
+  @tracked discordStats = null;
+
+  /** @type {boolean} Loading state for Discord invites */
+  @tracked discordLoading = false;
+
   /**
    * Initialize controller and load initial data
    * @returns {Promise<void>}
@@ -35,6 +44,7 @@ export default class AdminPluginsGithubSponsors extends Controller {
     super.init(...arguments);
     this.loadHistory();
     this.loadRateLimit();
+    this.loadDiscordInvites();
   }
 
   /**
@@ -67,6 +77,27 @@ export default class AdminPluginsGithubSponsors extends Controller {
       this.rateLimit = response.rate_limit;
     } catch {
       // Error loading rate limit
+    }
+  }
+
+  /**
+   * Load Discord invite history from the server
+   * @action
+   * @returns {Promise<void>}
+   */
+  @action
+  async loadDiscordInvites() {
+    this.discordLoading = true;
+    try {
+      const response = await ajax(
+        "/admin/plugins/github-sponsors/discord-invites"
+      );
+      this.discordInvites = response.invites;
+      this.discordStats = response.stats;
+    } catch {
+      // Error loading Discord invites
+    } finally {
+      this.discordLoading = false;
     }
   }
 
