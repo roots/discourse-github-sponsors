@@ -5,20 +5,20 @@
 # Table name: discourse_github_sponsors_discord_invite_logs
 #
 #  id               :bigint           not null, primary key
-#  user_id          :integer          not null
-#  github_username  :string(255)
 #  discord_username :string(255)      not null
-#  invite_code      :string(50)       not null
-#  created_at       :datetime         not null
-#  expires_at       :datetime         not null
-#  used_at          :datetime
 #  expired          :boolean          default(FALSE), not null
+#  expires_at       :datetime         not null
+#  github_username  :string(255)
+#  invite_code      :string(50)       not null
+#  used_at          :datetime
+#  created_at       :datetime         not null
+#  user_id          :integer          not null
 #
 # Indexes
 #
-#  index_discourse_github_sponsors_discord_invite_logs_on_user_id      (user_id)
-#  index_discourse_github_sponsors_discord_invite_logs_on_created_at   (created_at)
-#  index_discourse_github_sponsors_discord_invite_logs_on_invite_code  (invite_code) UNIQUE
+#  idx_discord_invites_code        (invite_code) UNIQUE
+#  idx_discord_invites_created_at  (created_at)
+#  idx_discord_invites_user_id     (user_id)
 #
 
 class DiscordInviteLog < ActiveRecord::Base
