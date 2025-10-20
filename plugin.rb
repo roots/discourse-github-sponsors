@@ -56,6 +56,7 @@ after_initialize do
         :constraints => AdminConstraint.new
     post "/admin/plugins/github-sponsors/sync" => "discourse_github_sponsors/admin#sync",
          :constraints => AdminConstraint.new
+    get "/sponsors/status" => "discourse_github_sponsors/user_status#show"
   end
 
   add_admin_route "github_sponsors.title", "github-sponsors"

@@ -7,7 +7,16 @@ en:
       last_sync: "Last sync:"
       sync_history_title: "Sync History (Last 10)"
       sync_results_title: "Sync Results"
-      
+
+      sponsor_status:
+        title: "GitHub Sponsor Status"
+        active: "Active GitHub Sponsor"
+        inactive: "Not a GitHub Sponsor"
+        checking: "Checking sponsor status..."
+        member_since: "Sponsor since"
+        learn_more: "Learn more about sponsoring"
+        sponsor_url: "https://github.com/sponsors/roots"
+
       table:
         time: "Time"
         status: "Status"
