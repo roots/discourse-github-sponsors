@@ -50,3 +50,34 @@ discourse_github_sponsors:
   github_sponsors_verbose_log:
     default: false
     description: "Enable verbose logging for GitHub Sponsors sync operations"
+
+  discord_server_guild_id:
+    default: ""
+    type: string
+    description: "Discord server (guild) ID for sponsor access"
+    validator: "DiscordGuildIdValidator"
+
+  discord_invite_channel_id:
+    default: ""
+    type: string
+    description: "Discord channel ID to generate invite links for"
+    validator: "DiscordChannelIdValidator"
+
+  discord_bot_token:
+    default: ""
+    type: secret
+    description: "Discord bot token (requires CREATE_INSTANT_INVITE and VIEW_CHANNEL permissions)"
+    validator: "DiscordBotTokenValidator"
+
+  discord_webhook_url:
+    default: ""
+    type: string
+    description: "Optional Discord webhook URL for notifications when invites are generated"
+    validator: "DiscordWebhookValidator"
+
+  discord_invite_max_age:
+    default: 3600
+    type: integer
+    min: 1800
+    max: 86400
+    description: "How long Discord invite links are valid (in seconds, default 1 hour)"

@@ -12,6 +12,10 @@ enabled_site_setting :github_sponsors_enabled
 # Load validators before initialize
 require_relative "lib/validators/github_token_validator"
 require_relative "lib/validators/github_account_validator"
+require_relative "lib/validators/discord_guild_id_validator"
+require_relative "lib/validators/discord_channel_id_validator"
+require_relative "lib/validators/discord_bot_token_validator"
+require_relative "lib/validators/discord_webhook_validator"
 
 require_relative "lib/engine"
 
@@ -23,6 +27,7 @@ after_initialize do
   require_relative "lib/api"
   require_relative "lib/seed"
   require_relative "lib/sync"
+  require_relative "lib/discord_api"
 
   # Load jobs
   require_relative "app/jobs/scheduled/github_sponsors_sync"
@@ -57,6 +62,8 @@ after_initialize do
     post "/admin/plugins/github-sponsors/sync" => "discourse_github_sponsors/admin#sync",
          :constraints => AdminConstraint.new
     get "/sponsors/status" => "discourse_github_sponsors/user_status#show"
+    get "/sponsors/discord/status" => "discourse_github_sponsors/discord#status"
+    post "/sponsors/discord/invite" => "discourse_github_sponsors/discord#generate_invite"
   end
 
   add_admin_route "github_sponsors.title", "github-sponsors"

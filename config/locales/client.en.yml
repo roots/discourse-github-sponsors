@@ -17,6 +17,23 @@ en:
         learn_more: "Learn more about sponsoring"
         sponsor_url: "https://github.com/sponsors/roots"
 
+      discord_access:
+        title: "Discord Server Access"
+        checking: "Checking Discord status..."
+        on_server: "You are on the Discord server"
+        not_linked: "Link your Discord account to join our server"
+        can_join: "You can join our Discord server"
+        link_discord_button: "Link Discord Account"
+        requirements: "Requirements: Active GitHub sponsor + Linked Discord account"
+
+      discord_invite:
+        generate_button: "Generate Discord Invite"
+        generating: "Generating invite..."
+        success_title: "Your Discord Invite is Ready"
+        join_server: "Join Discord Server"
+        copy_link: "Copy Link"
+        expires_in: "Expires in %{time}"
+
       table:
         time: "Time"
         status: "Status"

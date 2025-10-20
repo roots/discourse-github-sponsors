@@ -12,18 +12,22 @@ en:
     errors:
       github_token_invalid: "Invalid GitHub token format. Must be a valid personal access token (ghp_... or 40 hex characters)"
       github_account_invalid: "Invalid GitHub account name. Must be a valid GitHub username or organization"
+      discord_guild_id_invalid: "Invalid Discord server ID. Must be a 17-19 digit Discord snowflake ID"
+      discord_channel_id_invalid: "Invalid Discord channel ID. Must be a 17-19 digit Discord snowflake ID"
+      discord_bot_token_invalid: "Invalid Discord bot token format. Must be a valid bot token with three dot-separated parts"
+      discord_webhook_url_invalid: "Invalid Discord webhook URL. Must be a valid Discord webhook URL (https://discord.com/api/webhooks/...)"
       
   github_sponsors:
     badge_name: "GitHub Sponsor"
     badge_description: "Active GitHub Sponsor"
     badge_long_description: "This badge is granted to active GitHub sponsors"
     group_full_name: "GitHub Sponsors"
-    
+
     sync:
       started: "Starting GitHub sponsors sync"
       completed: "GitHub sponsors sync completed: %{matched} matched, %{unmatched} unmatched"
       failed: "GitHub sponsors sync failed: %{error}"
-      
+
     errors:
       plugin_disabled: "GitHub Sponsors plugin is disabled"
       no_token: "GitHub token not configured"
@@ -32,6 +36,10 @@ en:
       missing_scopes: "Token missing required scopes: %{scopes}"
       api_error: "GitHub API error: %{message}"
       rate_limited: "GitHub API rate limit exceeded. Try again later."
+      not_sponsor: "You must be an active GitHub sponsor to access this feature"
+      discord_not_linked: "You must link your Discord account first"
+      already_on_server: "You are already on the Discord server"
+      bot_permission: "Discord bot lacks permissions. Please contact an admin."
 
   dashboard:
     github_sponsors:
