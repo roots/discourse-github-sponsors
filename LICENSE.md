@@ -1,5 +1,6 @@
 The MIT License (MIT)
 
+Copyright (c) Civilized Discourse Construction Kit, Inc.
 Copyright (c) Roots Software LLC
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
