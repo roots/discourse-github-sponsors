@@ -8,7 +8,13 @@ en:
     github_sponsors_flair_color: "Text color for sponsor flair (hex without #)"
     github_sponsors_flair_bg_color: "Background color for sponsor flair (hex without #)"
     github_sponsors_sync_history_retention_days: "Number of days to retain sync history records"
-    
+    github_sponsors_verbose_log: "Enable verbose logging for GitHub Sponsors sync operations"
+    discord_server_guild_id: "Discord server (guild) ID for sponsor access"
+    discord_invite_channel_id: "Discord channel ID to generate invite links for"
+    discord_bot_token: "Discord bot token (requires CREATE_INSTANT_INVITE and VIEW_CHANNEL permissions)"
+    discord_webhook_url: "Optional Discord webhook URL for notifications when invites are generated"
+    discord_invite_max_age: "How long Discord invite links are valid (in seconds, default 1 hour)"
+
     errors:
       github_token_invalid: "Invalid GitHub token format. Must be a valid personal access token (ghp_... or 40 hex characters)"
       github_account_invalid: "Invalid GitHub account name. Must be a valid GitHub username or organization"
