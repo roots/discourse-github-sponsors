@@ -1,0 +1,423 @@
+import { on } from "@ember/modifier";
+import { eq } from "discourse/truth-helpers";
+
+<template>
+  <section class="github-sponsors-admin">
+    <h1>GitHub Sponsors Sync</h1>
+
+    <div style="margin-bottom: 20px;">
+      <button
+        type="button"
+        class="btn btn-primary"
+        {{on "click" @controller.syncSponsors}}
+        disabled={{@controller.loading}}
+      >
+        {{#if @controller.loading}}
+          Syncing...
+        {{else}}
+          Sync Sponsors Now
+        {{/if}}
+      </button>
+      {{#if @controller.lastSyncTime}}
+        <span style="margin-left: 10px; color: #666;">Last sync:
+          {{@controller.lastSyncTime}}</span>
+      {{/if}}
+      {{#if @controller.rateLimit}}
+        <span style="margin-left: 20px; color: #666;">
+          API Rate Limit:
+          {{@controller.rateLimit.remaining}}
+          remaining
+          {{#if @controller.rateLimit.reset_in}}
+            (resets in
+            {{@controller.rateLimit.reset_in}}s)
+          {{/if}}
+        </span>
+      {{/if}}
+    </div>
+
+    <div
+      style="background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 5px; padding: 15px; margin-bottom: 20px;"
+    >
+      <h3>Discord Invite History</h3>
+
+      {{#if @controller.discordLoading}}
+        <p style="text-align: center; color: #666; padding: 20px;">
+          Loading Discord invite history...
+        </p>
+      {{else}}
+        {{#if @controller.discordStats}}
+          <div
+            style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 15px; margin-bottom: 15px; padding: 15px; background: white; border-radius: 5px;"
+          >
+            <div style="text-align: center;">
+              <div style="font-size: 24px; font-weight: bold; color: #007bff;">
+                {{@controller.discordStats.total}}
+              </div>
+              <div style="font-size: 12px; color: #666;">Total Invites</div>
+            </div>
+            <div style="text-align: center;">
+              <div style="font-size: 24px; font-weight: bold; color: #28a745;">
+                {{@controller.discordStats.used}}
+              </div>
+              <div style="font-size: 12px; color: #666;">Used</div>
+            </div>
+            <div style="text-align: center;">
+              <div style="font-size: 24px; font-weight: bold; color: #dc3545;">
+                {{@controller.discordStats.expired}}
+              </div>
+              <div style="font-size: 12px; color: #666;">Expired</div>
+            </div>
+            <div style="text-align: center;">
+              <div style="font-size: 24px; font-weight: bold; color: #17a2b8;">
+                {{@controller.discordStats.active}}
+              </div>
+              <div style="font-size: 12px; color: #666;">Active</div>
+            </div>
+            <div style="text-align: center;">
+              <div style="font-size: 24px; font-weight: bold; color: #6c757d;">
+                {{@controller.discordStats.usage_rate}}%
+              </div>
+              <div style="font-size: 12px; color: #666;">Usage Rate</div>
+            </div>
+          </div>
+        {{/if}}
+
+        {{#if @controller.discordInvites.length}}
+          <table style="width: 100%; border-collapse: collapse;">
+            <thead>
+              <tr style="background: #e9ecef;">
+                <th
+                  style="padding: 8px; text-align: left; border-bottom: 2px solid #dee2e6;"
+                >User</th>
+                <th
+                  style="padding: 8px; text-align: left; border-bottom: 2px solid #dee2e6;"
+                >GitHub</th>
+                <th
+                  style="padding: 8px; text-align: left; border-bottom: 2px solid #dee2e6;"
+                >Discord</th>
+                <th
+                  style="padding: 8px; text-align: left; border-bottom: 2px solid #dee2e6;"
+                >Created</th>
+                <th
+                  style="padding: 8px; text-align: left; border-bottom: 2px solid #dee2e6;"
+                >Expires</th>
+                <th
+                  style="padding: 8px; text-align: center; border-bottom: 2px solid #dee2e6;"
+                >Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {{#each @controller.discordInvites as |invite|}}
+                <tr style="border-bottom: 1px solid #dee2e6;">
+                  <td style="padding: 8px;">{{invite.username}}</td>
+                  <td style="padding: 8px;">{{invite.github_username}}</td>
+                  <td style="padding: 8px;">{{invite.discord_username}}</td>
+                  <td
+                    style="padding: 8px; font-size: 12px;"
+                  >{{invite.created_at}}</td>
+                  <td
+                    style="padding: 8px; font-size: 12px;"
+                  >{{invite.expires_at}}</td>
+                  <td style="padding: 8px; text-align: center;">
+                    {{#if (eq invite.status "used")}}
+                      <span
+                        style="background: #d4edda; color: #155724; padding: 2px 8px; border-radius: 3px; font-size: 11px; font-weight: bold;"
+                      >USED</span>
+                    {{else if invite.expired}}
+                      <span
+                        style="background: #f8d7da; color: #721c24; padding: 2px 8px; border-radius: 3px; font-size: 11px; font-weight: bold;"
+                      >EXPIRED</span>
+                    {{else}}
+                      <span
+                        style="background: #d1ecf1; color: #0c5460; padding: 2px 8px; border-radius: 3px; font-size: 11px; font-weight: bold;"
+                      >ACTIVE</span>
+                    {{/if}}
+                  </td>
+                </tr>
+              {{/each}}
+            </tbody>
+          </table>
+        {{else}}
+          <p
+            style="text-align: center; color: #666; padding: 40px; background: white; border-radius: 5px;"
+          >
+            No Discord invites have been generated yet. Once sponsors generate
+            invites, they will appear here.
+          </p>
+        {{/if}}
+      {{/if}}
+    </div>
+
+    {{#if @controller.syncHistory.length}}
+      <div
+        style="background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 5px; padding: 15px; margin-bottom: 20px;"
+      >
+        <h3>Sync History (Last 10)</h3>
+        <table style="width: 100%; border-collapse: collapse;">
+          <thead>
+            <tr style="background: #e9ecef;">
+              <th
+                style="padding: 8px; text-align: left; border-bottom: 2px solid #dee2e6;"
+              >Time</th>
+              <th
+                style="padding: 8px; text-align: center; border-bottom: 2px solid #dee2e6;"
+              >Status</th>
+              <th
+                style="padding: 8px; text-align: center; border-bottom: 2px solid #dee2e6;"
+              >Total</th>
+              <th
+                style="padding: 8px; text-align: center; border-bottom: 2px solid #dee2e6;"
+              >Matched</th>
+              <th
+                style="padding: 8px; text-align: center; border-bottom: 2px solid #dee2e6;"
+              >Added</th>
+              <th
+                style="padding: 8px; text-align: center; border-bottom: 2px solid #dee2e6;"
+              >Removed</th>
+              <th
+                style="padding: 8px; text-align: left; border-bottom: 2px solid #dee2e6;"
+              >Error</th>
+            </tr>
+          </thead>
+          <tbody>
+            {{#each @controller.syncHistory as |entry|}}
+              <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 8px;">{{entry.synced_at}}</td>
+                <td style="padding: 8px; text-align: center;">
+                  {{#if entry.success}}
+                    <span style="color: #28a745;">✓</span>
+                  {{else}}
+                    <span style="color: #dc3545;">✗</span>
+                  {{/if}}
+                </td>
+                <td
+                  style="padding: 8px; text-align: center;"
+                >{{entry.total_sponsors}}</td>
+                <td
+                  style="padding: 8px; text-align: center;"
+                >{{entry.matched_sponsors}}</td>
+                <td style="padding: 8px; text-align: center;">
+                  {{#if entry.added_users}}
+                    <span style="color: #28a745;">+{{entry.added_users}}</span>
+                  {{else}}
+                    0
+                  {{/if}}
+                </td>
+                <td style="padding: 8px; text-align: center;">
+                  {{#if entry.removed_users}}
+                    <span
+                      style="color: #dc3545;"
+                    >-{{entry.removed_users}}</span>
+                  {{else}}
+                    0
+                  {{/if}}
+                </td>
+                <td
+                  style="padding: 8px; color: #dc3545; font-size: 12px;"
+                >{{entry.error_message}}</td>
+              </tr>
+            {{/each}}
+          </tbody>
+        </table>
+      </div>
+    {{/if}}
+
+    {{#if @controller.debugInfo}}
+      <div
+        style="background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 5px; padding: 20px; margin-bottom: 20px;"
+      >
+        {{#if @controller.debugInfo.error}}
+          <div
+            style="background: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; padding: 10px; border-radius: 3px; margin-bottom: 10px;"
+          >
+            <strong>Error:</strong>
+            {{@controller.debugInfo.error}}
+            {{#if @controller.debugInfo.details}}
+              <details style="margin-top: 10px;">
+                <summary style="cursor: pointer;">Show Details</summary>
+                <pre
+                  style="margin-top: 10px; padding: 10px; background: white; border-radius: 3px; overflow-x: auto;"
+                >{{@controller.debugInfo.details}}</pre>
+              </details>
+            {{/if}}
+            {{#if @controller.debugInfo.stack}}
+              <details style="margin-top: 10px;">
+                <summary style="cursor: pointer;">Stack Trace</summary>
+                <pre
+                  style="margin-top: 10px; padding: 10px; background: white; border-radius: 3px; overflow-x: auto; font-size: 11px;"
+                >{{@controller.debugInfo.stack}}</pre>
+              </details>
+            {{/if}}
+          </div>
+        {{else}}
+          <h3>Sync Results</h3>
+
+          <div
+            style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;"
+          >
+            <div>
+              <strong>GitHub Account:</strong>
+              {{@controller.debugInfo.github_account}}<br />
+              <strong>Group Name:</strong>
+              {{@controller.debugInfo.group_name}}<br />
+              <strong>Total GitHub Sponsors:</strong>
+              {{@controller.debugInfo.total_sponsors}}<br />
+              <strong>Discourse Users with GitHub:</strong>
+              {{@controller.debugInfo.discourse_users_with_github}}<br />
+              <strong>Current Group Size:</strong>
+              {{@controller.debugInfo.current_group_size}}
+            </div>
+            <div>
+              <strong>Matched Sponsors:</strong>
+              {{@controller.debugInfo.matched_sponsors.length}}<br />
+              <strong>Unmatched Sponsors:</strong>
+              {{@controller.debugInfo.unmatched_sponsors.length}}<br />
+              <strong>Added to Group:</strong>
+              {{@controller.debugInfo.added_users.length}}<br />
+              <strong>Removed from Group:</strong>
+              {{@controller.debugInfo.removed_users.length}}<br />
+              <strong>Already in Group:</strong>
+              {{@controller.debugInfo.already_in_group.length}}
+              {{#if @controller.debugInfo.badges_granted}}
+                <br /><strong style="color: #28a745;">✓ Badges Granted</strong>
+              {{/if}}
+            </div>
+          </div>
+
+          {{#if @controller.debugInfo.matched_sponsors.length}}
+            <details style="margin-bottom: 15px;">
+              <summary
+                style="cursor: pointer; font-weight: bold; padding: 5px; background: #e9ecef; border-radius: 3px;"
+              >
+                ✅ Matched Sponsors ({{@controller.debugInfo.matched_sponsors.length}})
+              </summary>
+              <div
+                style="padding: 10px; background: white; border: 1px solid #dee2e6; border-radius: 3px; margin-top: 5px;"
+              >
+                <table style="width: 100%;">
+                  <thead>
+                    <tr style="background: #f8f9fa;">
+                      <th style="padding: 5px; text-align: left;">GitHub
+                        Username</th>
+                      <th style="padding: 5px; text-align: left;">Discourse
+                        Username</th>
+                      <th style="padding: 5px; text-align: left;">User ID</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {{#each
+                      @controller.debugInfo.matched_sponsors
+                      as |sponsor|
+                    }}
+                      <tr>
+                        <td
+                          style="padding: 5px;"
+                        >{{sponsor.github_username}}</td>
+                        <td
+                          style="padding: 5px;"
+                        >{{sponsor.discourse_username}}</td>
+                        <td style="padding: 5px;">{{sponsor.discourse_id}}</td>
+                      </tr>
+                    {{/each}}
+                  </tbody>
+                </table>
+              </div>
+            </details>
+          {{/if}}
+
+          {{#if @controller.debugInfo.unmatched_sponsors.length}}
+            <details style="margin-bottom: 15px;">
+              <summary
+                style="cursor: pointer; font-weight: bold; padding: 5px; background: #fff3cd; border-radius: 3px;"
+              >
+                ⚠️ Unmatched Sponsors ({{@controller.debugInfo.unmatched_sponsors.length}})
+                - No Discourse Account
+              </summary>
+              <div
+                style="padding: 10px; background: white; border: 1px solid #ffc107; border-radius: 3px; margin-top: 5px;"
+              >
+                <p>These GitHub sponsors don't have linked Discourse accounts:</p>
+                <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+                  {{#each
+                    @controller.debugInfo.unmatched_sponsors
+                    as |username|
+                  }}
+                    <span
+                      style="background: #f8f9fa; padding: 3px 8px; border-radius: 3px; border: 1px solid #dee2e6;"
+                    >
+                      {{username}}
+                    </span>
+                  {{/each}}
+                </div>
+              </div>
+            </details>
+          {{/if}}
+
+          {{#if @controller.debugInfo.added_users.length}}
+            <details style="margin-bottom: 15px;">
+              <summary
+                style="cursor: pointer; font-weight: bold; padding: 5px; background: #d4edda; border-radius: 3px;"
+              >
+                ➕ Newly Added ({{@controller.debugInfo.added_users.length}})
+              </summary>
+              <div
+                style="padding: 10px; background: white; border: 1px solid #28a745; border-radius: 3px; margin-top: 5px;"
+              >
+                {{#each @controller.debugInfo.added_users as |user|}}
+                  <div>{{user.username}} (GitHub: {{user.github}})</div>
+                {{/each}}
+              </div>
+            </details>
+          {{/if}}
+
+          {{#if @controller.debugInfo.removed_users.length}}
+            <details style="margin-bottom: 15px;">
+              <summary
+                style="cursor: pointer; font-weight: bold; padding: 5px; background: #f8d7da; border-radius: 3px;"
+              >
+                ➖ Removed ({{@controller.debugInfo.removed_users.length}})
+              </summary>
+              <div
+                style="padding: 10px; background: white; border: 1px solid #dc3545; border-radius: 3px; margin-top: 5px;"
+              >
+                {{#each @controller.debugInfo.removed_users as |user|}}
+                  <div>{{user.username}} (GitHub: {{user.github}})</div>
+                {{/each}}
+              </div>
+            </details>
+          {{/if}}
+
+          {{#if @controller.debugInfo.sponsor_usernames}}
+            <details style="margin-bottom: 15px;">
+              <summary
+                style="cursor: pointer; font-weight: bold; padding: 5px; background: #e9ecef; border-radius: 3px;"
+              >
+                📋 All GitHub Sponsor Usernames ({{@controller.debugInfo.sponsor_usernames.length}})
+              </summary>
+              <div
+                style="padding: 10px; background: white; border: 1px solid #dee2e6; border-radius: 3px; margin-top: 5px; max-height: 200px; overflow-y: auto;"
+              >
+                <div style="display: flex; flex-wrap: wrap; gap: 5px;">
+                  {{#each
+                    @controller.debugInfo.sponsor_usernames
+                    as |username|
+                  }}
+                    <code
+                      style="background: #f8f9fa; padding: 2px 6px; border-radius: 3px;"
+                    >{{username}}</code>
+                  {{/each}}
+                </div>
+              </div>
+            </details>
+          {{/if}}
+        {{/if}}
+      </div>
+    {{else}}
+      <div
+        style="background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 5px; padding: 20px; text-align: center; color: #6c757d;"
+      >
+        Click "Sync Sponsors Now" to fetch and display sponsor information
+      </div>
+    {{/if}}
+  </section>
+</template>

@@ -4,7 +4,7 @@ import { action } from "@ember/object";
 import { ajax } from "discourse/lib/ajax";
 
 /**
- * @component admin-plugins-github-sponsors
+ * @component admin-plugins/github-sponsors
  * Controller for the GitHub Sponsors admin interface
  * Manages sponsor syncing, history display, and API rate limits
  */
