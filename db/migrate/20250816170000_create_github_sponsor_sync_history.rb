@@ -16,9 +16,15 @@ class CreateGithubSponsorSyncHistory < ActiveRecord::Migration[7.0]
         t.timestamps
       end
 
-      add_index :github_sponsor_sync_histories, :synced_at unless index_exists?(:github_sponsor_sync_histories, :synced_at)
-      add_index :github_sponsor_sync_histories, :success unless index_exists?(:github_sponsor_sync_histories, :success)
-      add_index :github_sponsor_sync_histories, [:synced_at, :success] unless index_exists?(:github_sponsor_sync_histories, [:synced_at, :success])
+      unless index_exists?(:github_sponsor_sync_histories, :synced_at)
+        add_index :github_sponsor_sync_histories, :synced_at
+      end
+      unless index_exists?(:github_sponsor_sync_histories, :success)
+        add_index :github_sponsor_sync_histories, :success
+      end
+      unless index_exists?(:github_sponsor_sync_histories, %i[synced_at success])
+        add_index :github_sponsor_sync_histories, %i[synced_at success]
+      end
     end
   end
 end

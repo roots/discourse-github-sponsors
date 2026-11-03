@@ -33,7 +33,7 @@ module DiscourseGithubSponsors
       handle_error_response(response) unless response.success?
 
       result = JSON.parse(response.body)
-      
+
       # Check for GraphQL errors
       if result["errors"]
         error_messages = result["errors"].map { |e| e["message"] }.join(", ")
@@ -41,9 +41,7 @@ module DiscourseGithubSponsors
       end
 
       # Cache successful responses
-      if cache_key && result && !result["errors"]
-        set_cached(cache_key, result, cache_ttl)
-      end
+      set_cached(cache_key, result, cache_ttl) if cache_key && result && !result["errors"]
 
       result
     rescue JSON::ParserError => e
@@ -52,10 +50,8 @@ module DiscourseGithubSponsors
 
     def rate_limit_status
       # If we don't have rate limit info, fetch it
-      if @rate_limit_remaining.nil?
-        fetch_rate_limit_status
-      end
-      
+      fetch_rate_limit_status if @rate_limit_remaining.nil?
+
       {
         remaining: @rate_limit_remaining,
         reset_at: @rate_limit_reset ? Time.at(@rate_limit_reset) : nil,
@@ -195,7 +191,7 @@ module DiscourseGithubSponsors
       # For now, this is a placeholder for future implementation
       Rails.logger.info("Cache clear requested for GitHub Sponsors plugin")
     end
-    
+
     def fetch_rate_limit_status
       # Simple query to get rate limit info
       query = <<~GQL
@@ -206,11 +202,11 @@ module DiscourseGithubSponsors
           }
         }
       GQL
-      
+
       begin
         response = make_request(query)
         update_rate_limit_info(response)
-        
+
         if response.success?
           data = JSON.parse(response.body)
           if data.dig("data", "rateLimit")

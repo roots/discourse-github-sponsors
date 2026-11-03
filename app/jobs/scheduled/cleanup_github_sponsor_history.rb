@@ -9,8 +9,12 @@ module ::Jobs
       return unless SiteSetting.github_sponsors_enabled
 
       deleted_count = ::GithubSponsorSyncHistory.cleanup_old_entries
-      
-      Rails.logger.info("GitHub Sponsors: Daily cleanup completed, removed #{deleted_count} old records") if deleted_count > 0
+
+      if deleted_count > 0
+        Rails.logger.info(
+          "GitHub Sponsors: Daily cleanup completed, removed #{deleted_count} old records",
+        )
+      end
     end
   end
 end

@@ -14,7 +14,9 @@ module DiscourseGithubSponsors
       }
 
       if SiteSetting.github_sponsors_verbose_log
-        Rails.logger.info("[GitHub Sponsors] Starting sync for #{SiteSetting.github_sponsors_account}")
+        Rails.logger.info(
+          "[GitHub Sponsors] Starting sync for #{SiteSetting.github_sponsors_account}",
+        )
       end
 
       # Get or create the sponsors group
@@ -62,7 +64,9 @@ module DiscourseGithubSponsors
         user = github_user_lookup[sponsor_username_lower]
 
         if SiteSetting.github_sponsors_verbose_log && user
-          Rails.logger.info("[GitHub Sponsors] Matched sponsor #{sponsor_username} to user #{user.username}")
+          Rails.logger.info(
+            "[GitHub Sponsors] Matched sponsor #{sponsor_username} to user #{user.username}",
+          )
         end
 
         if user

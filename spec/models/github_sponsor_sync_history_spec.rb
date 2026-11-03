@@ -9,10 +9,10 @@ RSpec.describe GithubSponsorSyncHistory, type: :model do
         result = {
           total_sponsors: 10,
           matched_sponsors: [1, 2, 3],
-          unmatched_sponsors: ["user1", "user2"],
+          unmatched_sponsors: %w[user1 user2],
           added_users: [{ username: "test" }],
           removed_users: [],
-          sponsor_usernames: ["user1", "user2", "user3"]
+          sponsor_usernames: %w[user1 user2 user3],
         }
 
         entry = GithubSponsorSyncHistory.log_sync(result)
@@ -25,7 +25,7 @@ RSpec.describe GithubSponsorSyncHistory, type: :model do
         expect(entry.removed_users).to eq(0)
         expect(entry.success).to be true
         expect(entry.error_message).to be_nil
-        expect(entry.details["sponsor_usernames"]).to eq(["user1", "user2", "user3"])
+        expect(entry.details["sponsor_usernames"]).to eq(%w[user1 user2 user3])
       end
 
       it "handles nil arrays gracefully" do
@@ -34,7 +34,7 @@ RSpec.describe GithubSponsorSyncHistory, type: :model do
           matched_sponsors: nil,
           unmatched_sponsors: nil,
           added_users: nil,
-          removed_users: nil
+          removed_users: nil,
         }
 
         entry = GithubSponsorSyncHistory.log_sync(result)
@@ -64,17 +64,21 @@ RSpec.describe GithubSponsorSyncHistory, type: :model do
 
     it "stores details in JSON column" do
       result = {
-        sponsor_usernames: ["alice", "bob"],
+        sponsor_usernames: %w[alice bob],
         added_users: [{ username: "alice", github: "alice-gh" }],
         removed_users: [{ username: "charlie", github: "charlie-gh" }],
-        other_data: "should not be stored"
+        other_data: "should not be stored",
       }
 
       entry = GithubSponsorSyncHistory.log_sync(result)
 
-      expect(entry.details["sponsor_usernames"]).to eq(["alice", "bob"])
-      expect(entry.details["added_users"]).to eq([{ "username" => "alice", "github" => "alice-gh" }])
-      expect(entry.details["removed_users"]).to eq([{ "username" => "charlie", "github" => "charlie-gh" }])
+      expect(entry.details["sponsor_usernames"]).to eq(%w[alice bob])
+      expect(entry.details["added_users"]).to eq(
+        [{ "username" => "alice", "github" => "alice-gh" }],
+      )
+      expect(entry.details["removed_users"]).to eq(
+        [{ "username" => "charlie", "github" => "charlie-gh" }],
+      )
       expect(entry.details["other_data"]).to be_nil
     end
   end
@@ -82,18 +86,13 @@ RSpec.describe GithubSponsorSyncHistory, type: :model do
   describe ".recent" do
     it "returns last 10 entries ordered by synced_at desc" do
       # Create 15 entries with different times
-      15.times do |i|
-        GithubSponsorSyncHistory.create!(
-          synced_at: i.hours.ago,
-          total_sponsors: i
-        )
-      end
+      15.times { |i| GithubSponsorSyncHistory.create!(synced_at: i.hours.ago, total_sponsors: i) }
 
       recent = GithubSponsorSyncHistory.recent
 
       expect(recent.count).to eq(10)
-      expect(recent.first.total_sponsors).to eq(0)  # Most recent
-      expect(recent.last.total_sponsors).to eq(9)   # 10th most recent
+      expect(recent.first.total_sponsors).to eq(0) # Most recent
+      expect(recent.last.total_sponsors).to eq(9) # 10th most recent
     end
   end
 

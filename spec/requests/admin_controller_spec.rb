@@ -9,14 +9,12 @@ RSpec.describe DiscourseGithubSponsors::AdminController, type: :request do
   let!(:group) { Fabricate(:group, name: "sponsors") }
 
   before do
-    SiteSetting.github_sponsors_enabled = true  # Enable the plugin
+    SiteSetting.github_sponsors_enabled = true # Enable the plugin
     SiteSetting.github_sponsors_group_name = "sponsors"
     WebMock.disable_net_connect!(allow_localhost: true)
   end
 
-  after do
-    WebMock.reset!
-  end
+  after { WebMock.reset! }
 
   describe "#index" do
     context "when not logged in" do
@@ -85,13 +83,13 @@ RSpec.describe DiscourseGithubSponsors::AdminController, type: :request do
           unmatched_sponsors: 3,
           added_users: 2,
           removed_users: 1,
-          success: true
+          success: true,
         )
 
         GithubSponsorSyncHistory.create!(
           synced_at: 2.hours.ago,
           success: false,
-          error_message: "API error"
+          error_message: "API error",
         )
 
         get "/admin/plugins/github-sponsors/history.json"
@@ -99,7 +97,7 @@ RSpec.describe DiscourseGithubSponsors::AdminController, type: :request do
         expect(response.status).to eq(200)
         json = JSON.parse(response.body)
         expect(json["history"].length).to eq(2)
-        
+
         # Most recent first
         expect(json["history"][0]["success"]).to be true
         expect(json["history"][0]["total_sponsors"]).to eq(10)
@@ -159,13 +157,13 @@ RSpec.describe DiscourseGithubSponsors::AdminController, type: :request do
 
           it "performs sync successfully" do
             stub_github_account_type_check("test-org", is_organization: true)
-            stub_github_sponsors_request(sponsors: ["alice", "bob"])
+            stub_github_sponsors_request(sponsors: %w[alice bob])
 
             post "/admin/plugins/github-sponsors/sync.json"
 
             expect(response.status).to eq(200)
             json = JSON.parse(response.body)
-            
+
             expect(json["total_sponsors"]).to eq(2)
             expect(json["matched_sponsors"].length).to eq(1)
             expect(json["unmatched_sponsors"]).to eq(["bob"])
@@ -177,9 +175,9 @@ RSpec.describe DiscourseGithubSponsors::AdminController, type: :request do
             stub_github_account_type_check("test-org", is_organization: true)
             stub_github_sponsors_request(sponsors: ["alice"])
 
-            expect {
-              post "/admin/plugins/github-sponsors/sync.json"
-            }.to change { GithubSponsorSyncHistory.count }.by(1)
+            expect { post "/admin/plugins/github-sponsors/sync.json" }.to change {
+              GithubSponsorSyncHistory.count
+            }.by(1)
 
             history = GithubSponsorSyncHistory.last
             expect(history.success).to be true
@@ -204,7 +202,7 @@ RSpec.describe DiscourseGithubSponsors::AdminController, type: :request do
             group.add(user_with_github)
 
             stub_github_account_type_check("test-org", is_organization: true)
-            stub_github_sponsors_request(sponsors: [])  # No sponsors
+            stub_github_sponsors_request(sponsors: []) # No sponsors
 
             post "/admin/plugins/github-sponsors/sync.json"
 
@@ -231,9 +229,9 @@ RSpec.describe DiscourseGithubSponsors::AdminController, type: :request do
             stub_github_account_type_check("test-org", is_organization: true)
             stub_github_api_error(status: 500, message: "Server error")
 
-            expect {
-              post "/admin/plugins/github-sponsors/sync.json"
-            }.to change { GithubSponsorSyncHistory.count }.by(1)
+            expect { post "/admin/plugins/github-sponsors/sync.json" }.to change {
+              GithubSponsorSyncHistory.count
+            }.by(1)
 
             history = GithubSponsorSyncHistory.last
             expect(history.success).to be false
@@ -259,16 +257,18 @@ RSpec.describe DiscourseGithubSponsors::AdminController, type: :request do
                         "totalCount" => 150,
                         "pageInfo" => {
                           "hasNextPage" => true,
-                          "endCursor" => "cursor123"
+                          "endCursor" => "cursor123",
                         },
-                        "nodes" => sponsors_page_1.map { |s| 
-                          { "sponsorEntity" => { "login" => s }, "isActive" => true }
-                        }
-                      }
-                    }
-                  }
-                }.to_json
-              ).then
+                        "nodes" =>
+                          sponsors_page_1.map do |s|
+                            { "sponsorEntity" => { "login" => s }, "isActive" => true }
+                          end,
+                      },
+                    },
+                  },
+                }.to_json,
+              )
+              .then
               .to_return(
                 status: 200,
                 body: {
@@ -278,15 +278,16 @@ RSpec.describe DiscourseGithubSponsors::AdminController, type: :request do
                         "totalCount" => 150,
                         "pageInfo" => {
                           "hasNextPage" => false,
-                          "endCursor" => nil
+                          "endCursor" => nil,
                         },
-                        "nodes" => sponsors_page_2.map { |s| 
-                          { "sponsorEntity" => { "login" => s }, "isActive" => true }
-                        }
-                      }
-                    }
-                  }
-                }.to_json
+                        "nodes" =>
+                          sponsors_page_2.map do |s|
+                            { "sponsorEntity" => { "login" => s }, "isActive" => true }
+                          end,
+                      },
+                    },
+                  },
+                }.to_json,
               )
 
             post "/admin/plugins/github-sponsors/sync.json"
