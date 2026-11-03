@@ -3,9 +3,7 @@
 require_relative "../../plugin_helper"
 
 RSpec.describe DiscourseGithubSponsors::Seed do
-  before do
-    SiteSetting.github_sponsors_group_name = "test-sponsors"
-  end
+  before { SiteSetting.github_sponsors_group_name = "test-sponsors" }
 
   describe ".create_badge!" do
     context "when badge doesn't exist" do
@@ -55,7 +53,7 @@ RSpec.describe DiscourseGithubSponsors::Seed do
           badge_type_id: BadgeType::Gold,
           auto_revoke: false,
           enabled: false,
-          query: "SELECT 1"
+          query: "SELECT 1",
         )
       end
 
@@ -78,7 +76,10 @@ RSpec.describe DiscourseGithubSponsors::Seed do
     end
 
     it "logs the badge creation" do
-      Rails.logger.expects(:info).with(regexp_matches(/GitHub Sponsor badge created\/updated with ID: \d+/))
+      Rails
+        .logger
+        .expects(:info)
+        .with(regexp_matches(%r{GitHub Sponsor badge created/updated with ID: \d+}))
       DiscourseGithubSponsors::Seed.create_badge!
     end
   end
@@ -102,10 +103,8 @@ RSpec.describe DiscourseGithubSponsors::Seed do
 
       it "grants badges to users in the sponsors group" do
         group.add(user)
-        
-        expect {
-          DiscourseGithubSponsors::Seed.grant_badges!
-        }.to change { UserBadge.count }.by(1)
+
+        expect { DiscourseGithubSponsors::Seed.grant_badges! }.to change { UserBadge.count }.by(1)
 
         user_badge = UserBadge.last
         expect(user_badge.user_id).to eq(user.id)
@@ -114,8 +113,8 @@ RSpec.describe DiscourseGithubSponsors::Seed do
 
       it "doesn't grant badges to users not in the sponsors group" do
         other_user = Fabricate(:user)
-        group.add(user)  # Only add one user to the group
-        
+        group.add(user) # Only add one user to the group
+
         DiscourseGithubSponsors::Seed.grant_badges!
 
         expect(UserBadge.where(user_id: other_user.id, badge_id: badge.id)).to be_empty
@@ -123,9 +122,7 @@ RSpec.describe DiscourseGithubSponsors::Seed do
     end
 
     context "when badge doesn't exist" do
-      before do
-        Badge.where(name: "GitHub Sponsor").destroy_all
-      end
+      before { Badge.where(name: "GitHub Sponsor").destroy_all }
 
       it "returns early without error" do
         expect { DiscourseGithubSponsors::Seed.grant_badges! }.not_to raise_error

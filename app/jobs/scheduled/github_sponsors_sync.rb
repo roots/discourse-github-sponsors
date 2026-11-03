@@ -11,7 +11,7 @@ module ::Jobs
       Rails.logger.info("Starting GitHub sponsors sync")
 
       result = ::DiscourseGithubSponsors::Sync.new.perform
-      
+
       if result[:error]
         Rails.logger.error("GitHub sponsors sync failed: #{result[:error]}")
         ::GithubSponsorSyncHistory.log_sync(result, result[:error])
@@ -19,7 +19,7 @@ module ::Jobs
       end
 
       ::GithubSponsorSyncHistory.log_sync(result)
-      
+
       ::GithubSponsorSyncHistory.cleanup_old_entries
 
       Rails.logger.info(

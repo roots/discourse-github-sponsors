@@ -9,7 +9,9 @@ module GithubSponsorsSpecHelper
       user_id: user.id,
       provider_name: "github",
       provider_uid: "12345_#{github_username}",
-      info: { "nickname" => github_username },
+      info: {
+        "nickname" => github_username,
+      },
     )
     user
   end
@@ -22,17 +24,24 @@ module GithubSponsorsSpecHelper
             "totalCount" => sponsors.length,
             "pageInfo" => {
               "hasNextPage" => false,
-              "endCursor" => nil
+              "endCursor" => nil,
             },
-            "nodes" => sponsors.map { |s| { "sponsorEntity" => { "login" => s }, "isActive" => true } }
-          }
-        }
-      }
+            "nodes" =>
+              sponsors.map { |s| { "sponsorEntity" => { "login" => s }, "isActive" => true } },
+          },
+        },
+      },
     }
 
-    stub_request(:post, "https://api.github.com/graphql")
-      .with(body: hash_including("query" => /sponsorshipsAsMaintainer/))
-      .to_return(status: 200, body: response.to_json, headers: { "Content-Type" => "application/json" })
+    stub_request(:post, "https://api.github.com/graphql").with(
+      body: hash_including("query" => /sponsorshipsAsMaintainer/),
+    ).to_return(
+      status: 200,
+      body: response.to_json,
+      headers: {
+        "Content-Type" => "application/json",
+      },
+    )
   end
 
   def stub_github_user_sponsors_request(sponsors: [], account: "test-user")
@@ -42,28 +51,39 @@ module GithubSponsorsSpecHelper
   def stub_github_account_type_check(account, is_organization: true)
     # First stub the rate limit check that happens automatically
     stub_github_rate_limit
-    
+
     response = {
       "data" => {
-        "organization" => is_organization ? { "id" => "MDEyOk9yZ2FuaXphdGlvbjE=" } : nil
-      }
+        "organization" => is_organization ? { "id" => "MDEyOk9yZ2FuaXphdGlvbjE=" } : nil,
+      },
     }
 
-    stub_request(:post, "https://api.github.com/graphql")
-      .with(body: hash_including("query" => /organization\(login: "#{account}"\)/))
-      .to_return(status: 200, body: response.to_json, headers: { "Content-Type" => "application/json" })
+    stub_request(:post, "https://api.github.com/graphql").with(
+      body: hash_including("query" => /organization\(login: "#{account}"\)/),
+    ).to_return(
+      status: 200,
+      body: response.to_json,
+      headers: {
+        "Content-Type" => "application/json",
+      },
+    )
   end
 
   def stub_github_api_error(status: 401, message: "Bad credentials")
     # Stub rate limit check to fail too
     error_response = {
       "message" => message,
-      "documentation_url" => "https://docs.github.com/graphql"
+      "documentation_url" => "https://docs.github.com/graphql",
     }
 
     # Stub all GraphQL requests to return the error
-    stub_request(:post, "https://api.github.com/graphql")
-      .to_return(status: status, body: error_response.to_json, headers: { "Content-Type" => "application/json" })
+    stub_request(:post, "https://api.github.com/graphql").to_return(
+      status: status,
+      body: error_response.to_json,
+      headers: {
+        "Content-Type" => "application/json",
+      },
+    )
   end
 
   def stub_github_graphql_error(error_type: "INSUFFICIENT_SCOPES")
@@ -71,14 +91,19 @@ module GithubSponsorsSpecHelper
       "errors" => [
         {
           "type" => error_type,
-          "message" => "Your token has not been granted the required scopes"
-        }
-      ]
+          "message" => "Your token has not been granted the required scopes",
+        },
+      ],
     }
 
     # Stub all GraphQL requests to return the error
-    stub_request(:post, "https://api.github.com/graphql")
-      .to_return(status: 200, body: error_response.to_json, headers: { "Content-Type" => "application/json" })
+    stub_request(:post, "https://api.github.com/graphql").to_return(
+      status: 200,
+      body: error_response.to_json,
+      headers: {
+        "Content-Type" => "application/json",
+      },
+    )
   end
 
   def stub_github_rate_limit(remaining: 5000, reset_at: 1.hour.from_now)
@@ -86,22 +111,26 @@ module GithubSponsorsSpecHelper
       "data" => {
         "rateLimit" => {
           "remaining" => remaining,
-          "resetAt" => reset_at.iso8601
-        }
-      }
+          "resetAt" => reset_at.iso8601,
+        },
+      },
     }
-    
-    stub_request(:post, "https://api.github.com/graphql")
-      .with(body: /rateLimit/)
-      .to_return(status: 200, body: rate_limit_response.to_json, headers: { "Content-Type" => "application/json" })
+
+    stub_request(:post, "https://api.github.com/graphql").with(body: /rateLimit/).to_return(
+      status: 200,
+      body: rate_limit_response.to_json,
+      headers: {
+        "Content-Type" => "application/json",
+      },
+    )
   end
 
   def enable_github_sponsors_plugin
     SiteSetting.github_sponsors_enabled = true
     SiteSetting.github_sponsors_account = "test-org"
-    SiteSetting.github_sponsors_token = "ghp_" + "x" * 36  # Valid format: ghp_ + 36 chars
+    SiteSetting.github_sponsors_token = "ghp_" + "x" * 36 # Valid format: ghp_ + 36 chars
     SiteSetting.github_sponsors_group_name = "sponsors"
-    
+
     # Always stub rate limit by default to prevent API calls
     stub_github_rate_limit
   end
@@ -109,9 +138,10 @@ end
 
 RSpec.configure do |config|
   config.include GithubSponsorsSpecHelper
-  
+
   config.before(:each) do |example|
-    if example.metadata[:type] == :request || example.metadata[:type] == :model || example.metadata[:type] == :job
+    if example.metadata[:type] == :request || example.metadata[:type] == :model ||
+         example.metadata[:type] == :job
       SiteSetting.github_sponsors_enabled = false
     end
   end

@@ -35,9 +35,7 @@ RSpec.describe Jobs::GithubSponsorsSync, type: :job do
       end
 
       context "with verbose logging enabled" do
-        before do
-          SiteSetting.github_sponsors_verbose_log = true
-        end
+        before { SiteSetting.github_sponsors_verbose_log = true }
 
         it "logs detailed sync information" do
           user1 = create_user_with_github("alice")
@@ -48,10 +46,14 @@ RSpec.describe Jobs::GithubSponsorsSync, type: :job do
           allow(Rails.logger).to receive(:info)
 
           job.execute({})
-          
+
           # Verify our verbose logging calls happened
-          expect(Rails.logger).to have_received(:info).with("[GitHub Sponsors] Starting sync for test-org").once
-          expect(Rails.logger).to have_received(:info).with("[GitHub Sponsors] Matched sponsor alice to user #{user1.username}").once
+          expect(Rails.logger).to have_received(:info).with(
+            "[GitHub Sponsors] Starting sync for test-org",
+          ).once
+          expect(Rails.logger).to have_received(:info).with(
+            "[GitHub Sponsors] Matched sponsor alice to user #{user1.username}",
+          ).once
         end
       end
 
@@ -124,7 +126,7 @@ RSpec.describe Jobs::GithubSponsorsSync, type: :job do
 
           history = GithubSponsorSyncHistory.last
           expect(history.matched_sponsors).to eq(2)
-          expect(history.unmatched_sponsors).to eq(1)  # Count, not array
+          expect(history.unmatched_sponsors).to eq(1) # Count, not array
         end
 
         it "sets user title when user has no title" do
@@ -147,7 +149,7 @@ RSpec.describe Jobs::GithubSponsorsSync, type: :job do
           expect(user_with_github.primary_group_id).to eq(group.id)
 
           history = GithubSponsorSyncHistory.last
-          expect(history.added_users).to eq(1)  # This is a count
+          expect(history.added_users).to eq(1) # This is a count
           expect(history.details["added_users"]).to eq(
             [{ "username" => user_with_github.username, "github" => "alice" }],
           )
@@ -175,7 +177,7 @@ RSpec.describe Jobs::GithubSponsorsSync, type: :job do
           expect(group.users).not_to include(user_with_github_2)
 
           history = GithubSponsorSyncHistory.last
-          expect(history.removed_users).to eq(1)  # This is a count
+          expect(history.removed_users).to eq(1) # This is a count
           expect(history.details["removed_users"]).to eq(
             [{ "username" => user_with_github_2.username, "github" => "bob" }],
           )

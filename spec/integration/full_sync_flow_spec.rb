@@ -13,9 +13,7 @@ RSpec.describe "Full GitHub Sponsors Sync Flow", type: :request do
     sign_in(admin)
   end
 
-  after do
-    WebMock.reset!
-  end
+  after { WebMock.reset! }
 
   describe "complete sync workflow" do
     it "syncs sponsors, creates group, grants badges, and logs history" do
@@ -26,7 +24,7 @@ RSpec.describe "Full GitHub Sponsors Sync Flow", type: :request do
 
       # Stub GitHub API responses
       stub_github_account_type_check("test-org", is_organization: true)
-      stub_github_sponsors_request(sponsors: ["alice", "bob", "david"])
+      stub_github_sponsors_request(sponsors: %w[alice bob david])
 
       # Initial state checks
       group = Group.find_by(name: "sponsors")
@@ -37,7 +35,7 @@ RSpec.describe "Full GitHub Sponsors Sync Flow", type: :request do
       # Perform sync
       post "/admin/plugins/github-sponsors/sync.json"
       expect(response.status).to eq(200)
-      
+
       json = JSON.parse(response.body)
       expect(json["total_sponsors"]).to eq(3)
       expect(json["matched_sponsors"].length).to eq(2)
@@ -75,12 +73,13 @@ RSpec.describe "Full GitHub Sponsors Sync Flow", type: :request do
       # Create initial state with sponsors
       user1 = create_user_with_github("alice")
       user2 = create_user_with_github("bob")
-      
-      group = Group.create!(
-        name: "sponsors",
-        full_name: "Sponsors",
-        visibility_level: Group.visibility_levels[:public]
-      )
+
+      group =
+        Group.create!(
+          name: "sponsors",
+          full_name: "Sponsors",
+          visibility_level: Group.visibility_levels[:public],
+        )
       group.add(user1)
       group.add(user2)
 
@@ -91,7 +90,7 @@ RSpec.describe "Full GitHub Sponsors Sync Flow", type: :request do
       # Perform sync
       post "/admin/plugins/github-sponsors/sync.json"
       expect(response.status).to eq(200)
-      
+
       json = JSON.parse(response.body)
       expect(json["removed_users"].length).to eq(1)
       expect(json["removed_users"][0]["github"]).to eq("alice")
@@ -108,13 +107,14 @@ RSpec.describe "Full GitHub Sponsors Sync Flow", type: :request do
 
     it "updates flair settings when site settings change" do
       # Create group with initial flair
-      group = Group.create!(
-        name: "sponsors",
-        full_name: "Sponsors",
-        visibility_level: Group.visibility_levels[:public],
-        flair_icon: "old-icon",
-        flair_color: "111111"
-      )
+      group =
+        Group.create!(
+          name: "sponsors",
+          full_name: "Sponsors",
+          visibility_level: Group.visibility_levels[:public],
+          flair_icon: "old-icon",
+          flair_color: "111111",
+        )
 
       # Update site settings
       SiteSetting.github_sponsors_flair_icon = "seedling"
@@ -147,7 +147,7 @@ RSpec.describe "Full GitHub Sponsors Sync Flow", type: :request do
       # Perform sync
       post "/admin/plugins/github-sponsors/sync.json"
       expect(response.status).to eq(200)
-      
+
       json = JSON.parse(response.body)
       expect(json["error"]).to eq("Failed to fetch sponsors from GitHub API")
 
@@ -164,7 +164,7 @@ RSpec.describe "Full GitHub Sponsors Sync Flow", type: :request do
 
       # Stub pagination responses
       stub_github_account_type_check("test-org", is_organization: true)
-      
+
       sponsors_page_1 = (1..100).map { |i| "sponsor#{i}" }
       sponsors_page_2 = (101..150).map { |i| "sponsor#{i}" }
 
@@ -179,16 +179,18 @@ RSpec.describe "Full GitHub Sponsors Sync Flow", type: :request do
                   "totalCount" => 150,
                   "pageInfo" => {
                     "hasNextPage" => true,
-                    "endCursor" => "cursor123"
+                    "endCursor" => "cursor123",
                   },
-                  "nodes" => sponsors_page_1.map { |s| 
-                    { "sponsorEntity" => { "login" => s }, "isActive" => true }
-                  }
-                }
-              }
-            }
-          }.to_json
-        ).then
+                  "nodes" =>
+                    sponsors_page_1.map do |s|
+                      { "sponsorEntity" => { "login" => s }, "isActive" => true }
+                    end,
+                },
+              },
+            },
+          }.to_json,
+        )
+        .then
         .to_return(
           status: 200,
           body: {
@@ -198,21 +200,22 @@ RSpec.describe "Full GitHub Sponsors Sync Flow", type: :request do
                   "totalCount" => 150,
                   "pageInfo" => {
                     "hasNextPage" => false,
-                    "endCursor" => nil
+                    "endCursor" => nil,
                   },
-                  "nodes" => sponsors_page_2.map { |s| 
-                    { "sponsorEntity" => { "login" => s }, "isActive" => true }
-                  }
-                }
-              }
-            }
-          }.to_json
+                  "nodes" =>
+                    sponsors_page_2.map do |s|
+                      { "sponsorEntity" => { "login" => s }, "isActive" => true }
+                    end,
+                },
+              },
+            },
+          }.to_json,
         )
 
       # Perform sync
       post "/admin/plugins/github-sponsors/sync.json"
       expect(response.status).to eq(200)
-      
+
       json = JSON.parse(response.body)
       expect(json["total_sponsors"]).to eq(150)
       expect(json["matched_sponsors"].length).to eq(50)
@@ -233,7 +236,7 @@ RSpec.describe "Full GitHub Sponsors Sync Flow", type: :request do
 
       post "/admin/plugins/github-sponsors/sync.json"
       expect(response.status).to eq(200)
-      
+
       json = JSON.parse(response.body)
       expect(json["total_sponsors"]).to eq(1)
       expect(json["matched_sponsors"].length).to eq(1)
@@ -243,7 +246,7 @@ RSpec.describe "Full GitHub Sponsors Sync Flow", type: :request do
   describe "badge granting workflow" do
     it "grants badges via backfill after adding users to group" do
       user1 = create_user_with_github("alice")
-      
+
       stub_github_account_type_check("test-org", is_organization: true)
       stub_github_sponsors_request(sponsors: ["alice"])
 
@@ -252,24 +255,24 @@ RSpec.describe "Full GitHub Sponsors Sync Flow", type: :request do
 
       post "/admin/plugins/github-sponsors/sync.json"
       expect(response.status).to eq(200)
-      
+
       json = JSON.parse(response.body)
       expect(json["badges_granted"]).to be true
-      
+
       expect(BadgeGranter).to have_received(:backfill).with(badge)
     end
 
     it "sets badge as user title when user has the badge" do
       user1 = create_user_with_github("alice")
-      
+
       # Pre-grant the badge
       UserBadge.create!(
         user_id: user1.id,
         badge_id: badge.id,
         granted_at: Time.current,
-        granted_by_id: -1
+        granted_by_id: -1,
       )
-      
+
       stub_github_account_type_check("test-org", is_organization: true)
       stub_github_sponsors_request(sponsors: ["alice"])
 
@@ -290,16 +293,16 @@ RSpec.describe "Full GitHub Sponsors Sync Flow", type: :request do
           synced_at: (i + 1).hours.ago,
           total_sponsors: 10 - i,
           matched_sponsors: 5 - i,
-          success: i != 1  # Second one failed
+          success: i != 1, # Second one failed
         )
       end
 
       get "/admin/plugins/github-sponsors/history.json"
       expect(response.status).to eq(200)
-      
+
       json = JSON.parse(response.body)
       expect(json["history"].length).to eq(3)
-      
+
       # Most recent first
       expect(json["history"][0]["total_sponsors"]).to eq(10)
       expect(json["history"][0]["success"]).to be true

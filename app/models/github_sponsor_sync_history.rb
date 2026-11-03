@@ -49,13 +49,16 @@ class GithubSponsorSyncHistory < ActiveRecord::Base
   def self.cleanup_old_entries(retention_days = nil)
     retention_days ||= SiteSetting.github_sponsors_sync_history_retention_days
     cutoff_date = retention_days.days.ago
-    
+
     records_to_delete = where("synced_at < ?", cutoff_date)
     deleted_count = records_to_delete.count
     records_to_delete.destroy_all
-    
-    Rails.logger.info("GitHub Sponsors: Cleaned up #{deleted_count} sync history records older than #{retention_days} days") if deleted_count > 0
+
+    if deleted_count > 0
+      Rails.logger.info(
+        "GitHub Sponsors: Cleaned up #{deleted_count} sync history records older than #{retention_days} days",
+      )
+    end
     deleted_count
   end
 end
-
